@@ -1,1 +1,1 @@
-FROM jupyter/datascience-notebook:45e010d9e849
+FROM rocker/binder:3.4.3
