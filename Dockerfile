@@ -1,4 +1,4 @@
-FROM rocker/verse:3.4.3
+l0;95;0cFROM rocker/verse:3.4.3
 USER root
 
 ENV NB_USER rstudio
@@ -66,7 +66,6 @@ RUN R --quiet -e "devtools::install_github('IRkernel/IRkernel')" && \
     R --quiet -e "IRkernel::installspec(prefix='${VENV_DIR}')"
 
 RUN R -e "install.packages(c('kableExtra', 'ROCR', 'ISLR', 'ggridges', 'rstan', 'rstanarm', 'coda', 'mvtnorm', 'loo', 'MCMCpack'), repos = 'http://cran.us.r-project.org')" && \
-    R -e "devtools::install_github("gbm-developers/gbm3")" && \
     R -e "devtools::install_github("rmcelreath/rethinking") "
 
 
