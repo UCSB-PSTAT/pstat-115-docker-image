@@ -1,4 +1,4 @@
-l0;95;0cFROM rocker/verse:3.4.3
+FROM rocker/verse:3.4.3
 USER root
 
 ENV NB_USER rstudio
