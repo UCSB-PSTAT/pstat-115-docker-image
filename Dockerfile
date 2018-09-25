@@ -68,5 +68,5 @@ RUN R --quiet -e "devtools::install_github('IRkernel/IRkernel')" && \
 RUN R -e "install.packages(c('kableExtra', 'ROCR', 'ISLR', 'ggridges', 'rstan', 'rstanarm', 'coda', 'mvtnorm', 'loo', 'MCMCpack'), repos = 'http://cran.us.r-project.org')" && \
     R -e "devtools::install_github('rmcelreath/rethinking') "
 
-
-CMD jupyter notebook --ip 0.0.0.0
+RUN pip install jupyterhub==0.9.4
+# CMD jupyter notebook --ip 0.0.0.0
