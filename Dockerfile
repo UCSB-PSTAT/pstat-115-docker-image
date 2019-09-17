@@ -1,6 +1,6 @@
 FROM jupyter/r-notebook:latest
  
-LABEL maintainer="Sang-Yun Oh <syoh@ucsb.edu>"
+LABEL maintainer="Alexander Franks <amfranks@ucsb.edu>"
  
 USER root
 RUN git clone https://github.com/TheLocehiliosan/yadm.git /usr/local/share/yadm && \
@@ -107,8 +107,9 @@ ltm \
 randomForest \
 rpart \
 # Data
-ISLR
- 
+ISLR \
+tidytext
+
 RUN conda install -y -c conda-forge r-cairo && \
     install2.r --error imager
  
@@ -116,5 +117,16 @@ RUN installGithub.r \
     gbm-developers/gbm3 \
     bradleyboehmke/harrypotter && \
     install2.r --error rstantools shinystan
- 
+
+# More Bayes stuff
+
+RUN install2.r --error \
+coda \
+loo \
+projpred \
+MCMCpack \
+hflights \
+HDInterval \
+dendextend
+
 USER $NB_USER
