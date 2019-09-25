@@ -1,7 +1,8 @@
 FROM jupyter/r-notebook:latest
  
 LABEL maintainer="Alexander Franks <amfranks@ucsb.edu>"
- 
+ARG NB_USER="rstudio"
+
 USER root
 RUN git clone https://github.com/TheLocehiliosan/yadm.git /usr/local/share/yadm && \
     ln -s /usr/local/share/yadm/yadm /usr/local/bin/yadm
