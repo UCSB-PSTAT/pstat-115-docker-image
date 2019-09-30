@@ -1,7 +1,6 @@
 FROM jupyter/r-notebook:latest
  
 LABEL maintainer="Alexander Franks <amfranks@ucsb.edu>"
-ARG NB_USER="rstudio"
 
 USER root
 RUN git clone https://github.com/TheLocehiliosan/yadm.git /usr/local/share/yadm && \
@@ -108,8 +107,8 @@ ltm \
 randomForest \
 rpart \
 # Data
-ISLR \
-tidytext
+ISLR
+
 
 RUN conda install -y -c conda-forge r-cairo && \
     install2.r --error imager
@@ -128,6 +127,7 @@ projpred \
 MCMCpack \
 hflights \
 HDInterval \
-dendextend
+dendextend \
+tidytext
 
 USER $NB_USER
