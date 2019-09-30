@@ -127,7 +127,7 @@ projpred \
 MCMCpack \
 hflights \
 HDInterval \
-dendextend \
-tidytext
+tidytext \
+dendextend
 
 USER $NB_USER
