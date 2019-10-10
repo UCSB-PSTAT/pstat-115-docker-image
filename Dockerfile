@@ -128,6 +128,7 @@ MCMCpack \
 hflights \
 HDInterval \
 tidytext \
-dendextend
+dendextend \
+LearnBayes
 
 USER $NB_USER
