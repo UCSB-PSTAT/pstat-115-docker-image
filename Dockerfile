@@ -1,72 +1,116 @@
-FROM rocker/verse:3.4.3
+FROM dddlab/base-rstudio:v20200720-d6cbe5a-94fdd01b492f
+
+LABEL maintainer="Patrick Windmiller <windmiller@pstat.ucsb.edu>"
+
+USER $NB_USER
+
+RUN conda install -y r-base && \
+    conda install -c conda-forge udunits2 && \
+    conda install -c conda-forge imagemagick && \
+    conda install -c conda-forge r-rstan && \
+    conda install -c conda-forge r-units && \
+    conda install -c conda-forge r-sf && \
+    conda install -c conda-forge r-foreign
+
 USER root
 
-ENV NB_USER rstudio
-ENV NB_UID 1000
-ENV VENV_DIR /srv/venv
+RUN git clone https://github.com/TheLocehiliosan/yadm.git /usr/local/share/yadm && \
+    ln -s /usr/local/share/yadm/yadm /usr/local/bin/yadm
 
-# Set ENV for all programs...
-ENV PATH ${VENV_DIR}/bin:$PATH
-# And set ENV for R! It doesn't read from the environment...
-RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron
+RUN pip install nbgitpuller && \
+    jupyter serverextension enable --py nbgitpuller --sys-prefix
 
-# The `rsession` binary that is called by nbrsessionproxy to start R doesn't seem to start
-# without this being explicitly set
-ENV LD_LIBRARY_PATH /usr/local/lib/R/lib
+RUN pip install jupyter-server-proxy jupyter-rsession-proxy
 
-ENV HOME /home/${NB_USER}
-WORKDIR ${HOME}
-
-# Install essentials
-RUN apt-get update && \
-    apt-get -y install clang python3-venv python3-dev && \
-    apt-get purge && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
-
-# Global site-wide config
-RUN mkdir -p $HOME/.R/ \
-    && echo "\nCXX=clang++ -ftemplate-depth-256\n" >> $HOME/.R/Makevars \
-    && echo "CC=clang\n" >> $HOME/.R/Makevars
-
-# Install rstan
+# ggplot2 extensions
 RUN install2.r --error \
-    inline \
-    RcppEigen \
-    StanHeaders \
-    rstan \
-    KernSmooth
+    GGally \
+    ggridges \
+    RColorBrewer \
+    scales \
+    viridis
 
-# Config for rstudio user
-RUN mkdir -p /home/rstudio/.R/ \
-    && echo "\nCXX=clang++ -ftemplate-depth-256\n" >> /home/rstudio/.R/Makevars \
-    && echo "CC=clang\n" >> /home/rstudio/.R/Makevars \
-    && echo "CXXFLAGS=-O3\n" >> /home/rstudio/.R/Makevars \
-    && echo "\nrstan::rstan_options(auto_write = TRUE)" >> /home/rstudio/.Rprofile \
-    && echo "options(mc.cores = parallel::detectCores())" >> /home/rstudio/.Rprofile
+# Misc utilities
+RUN install2.r --error \
+    beepr \
+    config \
+    doParallel \
+    DT \
+    foreach \
+    formattable \
+    glue \
+    here \
+    Hmisc \
+    httr
 
+RUN install2.r --error \
+    jsonlite \
+    kableExtra \
+    logging \
+    MASS \
+    microbenchmark \
+    openxlsx \
+    pkgdown \
+    rlang
 
-# Create a venv dir owned by unprivileged user & set up notebook in it
-# This allows non-root to install python libraries if required
-RUN mkdir -p ${VENV_DIR} && chown -R ${NB_USER} ${VENV_DIR}
+RUN install2.r --error \
+    RPushbullet \
+    roxygen2 \
+    stringr \
+    styler \
+    testthat \
+    usethis  \
+    ggridges \
+    plotmo
 
-USER ${NB_USER}
-RUN python3 -m venv ${VENV_DIR} && \
-    pip3 install --no-cache-dir \
-         notebook==5.2 \
-         git+https://github.com/jupyterhub/nbrsessionproxy.git@6eefeac11cbe82432d026f41a3341525a22d6a0b \
-         git+https://github.com/jupyterhub/nbserverproxy.git@5508a182b2144d29824652d8977b32302517c8bc && \
-    jupyter serverextension enable --sys-prefix --py nbserverproxy && \
-    jupyter serverextension enable --sys-prefix --py nbrsessionproxy && \
-    jupyter nbextension install    --sys-prefix --py nbrsessionproxy && \
-    jupyter nbextension enable     --sys-prefix --py nbrsessionproxy
+# Caret and some ML packages
+RUN install2.r --error \
+    # ML framework
+    caret \
+    car \
+    ensembleR \
+    # metrics
+    MLmetrics \
+    pROC \
+    ROCR \
+    # Models
+    Rtsne \
+    NbClust
 
+RUN install2.r --error \
+    tree \
+    maptree \
+    arm \
+    e1071 \
+    elasticnet \
+    fitdistrplus \
+    gam \  
+    gamlss \
+    glmnet \
+    lme4 \  
+    ltm \
+    randomForest \
+    rpart \
+    # Data
+    ISLR
 
-RUN R --quiet -e "devtools::install_github('IRkernel/IRkernel')" && \
-    R --quiet -e "IRkernel::installspec(prefix='${VENV_DIR}')"
+RUN conda install -y -c conda-forge r-cairo && \
+    install2.r --error imager
 
-RUN R -e "install.packages(c('kableExtra', 'ROCR', 'ISLR', 'ggridges', 'rstan', 'rstanarm', 'coda', 'mvtnorm', 'loo', 'MCMCpack'), repos = 'http://cran.us.r-project.org')" && \
-    R -e "devtools::install_github("rmcelreath/rethinking") "
+RUN installGithub.r \
+    gbm-developers/gbm3 \
+    bradleyboehmke/harrypotter && \
+    install2.r --error rstantools shinystan
 
-RUN pip install jupyterhub==0.9.4
-# CMD jupyter notebook --ip 0.0.0.0
+# More Bayes stuff
+RUN install2.r --error \
+    coda \
+    loo \
+    projpred \
+    MCMCpack \
+    hflights \
+    HDInterval \
+    tidytext \
+    dendextend
+
+USER $NB_USER
