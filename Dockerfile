@@ -24,13 +24,9 @@ ENV R_HOME=/opt/conda/lib/R
  
 ## change littler defaults to conda R
 ARG LITTLER=$R_HOME/library/littler
-RUN echo "local({\n" \
-         "   r <- getOption('repos')\n" \
-         "   r['CRAN'] <- 'https://cloud.r-project.org'\n" \
-         "   options(repos = r)\n" \
-         "})\n" > $R_HOME/etc/Rprofile.site && \
-         \
-         R -e "install.packages(c('littler', 'docopt'))"
+RUN echo "local({r <- getOption('repos'); r['CRAN'] <- 'https://cloud.r-project.org';  options(repos = r)})" > $R_HOME/etc/Rprofile.site
+
+RUN R -e "install.packages(c('littler', 'docopt'))"
 RUN sed -i 's/\/usr\/local\/lib\/R\/site-library/\/opt\/conda\/lib\/R\/library/g' $LITTLER/examples/*.r && \
         ln -s $LITTLER/bin/r $LITTLER/examples/*.r /usr/local/bin/ && \
         echo "$R_HOME/lib" | sudo tee -a /etc/ld.so.conf.d/littler.conf && \
@@ -64,7 +60,6 @@ logging \
 MASS \
 microbenchmark \
 openxlsx \
-pkgdown \
 rlang
  
 RUN install2.r --error \
@@ -110,14 +105,9 @@ rpart \
 ISLR
 
 
-RUN conda install -y -c conda-forge r-cairo && \
-    install2.r --error imager
+RUN conda install -y -c conda-forge r-cairo libv8
+##    install2.r --error imager
  
-RUN installGithub.r \
-    gbm-developers/gbm3 \
-    bradleyboehmke/harrypotter && \
-    install2.r --error rstantools shinystan
-
 # More Bayes stuff
 
 RUN install2.r --error \
@@ -129,6 +119,13 @@ hflights \
 HDInterval \
 tidytext \
 dendextend \
-LearnBayes
+LearnBayes \
+imager
+
+
+RUN installGithub.r \
+     gbm-developers/gbm3 \
+     bradleyboehmke/harrypotter
+RUN R -e "install.packages(c('rstantools', 'shinystan'))"
 
 USER $NB_USER
