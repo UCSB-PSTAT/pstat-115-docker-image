@@ -104,6 +104,9 @@ rpart \
 # Data
 ISLR
 
+# added packages for Fall 2020
+RUN install2.r --error \
+patchwork
 
 RUN conda install -y -c conda-forge r-cairo libv8
 ##    install2.r --error imager
