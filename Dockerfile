@@ -133,4 +133,4 @@ RUN R -e "install.packages(c('rstantools', 'shinystan'))"
 
 USER $NB_USER
 
-RUN R -e "devtools::install_github('ucbds-infra/ottr@0.0.1')"
+RUN R -e "devtools::install_github('ucbds-infra/ottr@0.0.2')"
