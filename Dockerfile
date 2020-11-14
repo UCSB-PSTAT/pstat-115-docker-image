@@ -131,6 +131,8 @@ RUN installGithub.r \
      bradleyboehmke/harrypotter
 RUN R -e "install.packages(c('rstantools', 'shinystan'))"
 
+RUN R -e "dotR <- file.path(Sys.getenv('HOME'), '.R'); if(!file.exists(dotR)){ dir.create(dotR) }; M <- file.path(dotR, 'Makevars'); if (!file.exists(M)){  file.create(M) }; cat('\nCXX14FLAGS=-O3 -Wno-unused-variable -Wno-unused-function', 'CXX14 = g++ -std=c++1y', file = M, sep = '\n', append = TRUE)"
+
 USER $NB_USER
 
 RUN R -e "devtools::install_github('ucbds-infra/ottr@0.0.2')"
